@@ -96,8 +96,8 @@ for did in tqdm(entity_TFIDF):
             avg_ent_num += 1
 
 avg_ent_num /= all_doc_num
-print("avg num of ent per doc",avg_ent_num)
-print("reduce in comp",(avg_ent_num_ori / avg_ent_num) **2)
+# print("avg num of ent per doc",avg_ent_num)
+# print("reduce in comp",(avg_ent_num_ori / avg_ent_num) **2)
 # -
 
 dict_propid2value = {}
@@ -172,6 +172,8 @@ for NQ_idx, NQ_ins in enumerate(tqdm(NQ_data)):
         NQ_c2c_triples.append([])
         NQ_q2c_triples.append([])
 
+print("Sleeping for 10m, to resolve connection errors ")
+time.sleep(600)
 # error handling
 batch_size = 20
 for NQ_idx in tqdm(error_list):
