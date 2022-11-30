@@ -1,4 +1,4 @@
-# KB_triple_extractor
+# Wikidata_triple_extractor
 
 ## Description
 
