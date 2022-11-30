@@ -1,4 +1,13 @@
-# Inter-Passage_triple_extractor
+# KB_triple_extractor
+
+## Description
+
+For a given query and n passages, this code extracts triples between (inter/intra) passages and a query. The dataset used in this code is Open NQ, which consists of queries of the original Natural Questions, and evidence documents retrieved through DPR (https://github.com/facebookresearch/DPR). You can get the dataset from: <code>get-data.sh </code> in https://github.com/facebookresearch/FiD. 
+
+What this code does
+1. Perform entity linking in given queries and passages (entity_linking.py).
+2. Obtain a relaton list that can exist between linked entities, using Wikidata (KB) API (NQ_triple_extractor.py).
+3. Filter relations using TFIDF scores. 
 
 ## Packages
 
