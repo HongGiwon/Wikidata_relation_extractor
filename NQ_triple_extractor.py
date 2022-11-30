@@ -56,6 +56,32 @@ for did in tqdm(dict_ctx_ent):
         f_de = dict_ctx_ent[did].count(eid)
         TF_de = (f_de * (k1 + 1)) / (f_de + k1 * (1 - b + b * (len(dict_ctx_ent[did]) / avg_doc_len)))
         entity_TFIDF[did][eid] = entity_IDF[eid] * TF_de
+
+# +
+with open('./entity_TFIDF.pkl', 'wb') as f:
+    pickle.dump(entity_TFIDF, f)
+
+avg_ent_num_ori = 0
+for did in tqdm(entity_TFIDF):
+    for eid in entity_TFIDF[did]:
+        avg_ent_num_ori += 1
+
+avg_ent_num_ori /= all_doc_num
+
+# +
+dict_set_ctx_ent_tdidf = {}
+avg_ent_num = 0
+thre_tfidf = 10.0
+for did in tqdm(entity_TFIDF):
+    dict_set_ctx_ent_tdidf[did] = set()
+    for eid in entity_TFIDF[did]:
+        if entity_TFIDF[did][eid] > thre_tfidf:
+            dict_set_ctx_ent_tdidf[did].add(eid)
+            avg_ent_num += 1
+
+avg_ent_num /= all_doc_num
+print("avg num of ent per doc",avg_ent_num)
+print("reduce in comp",(avg_ent_num_ori / avg_ent_num) **2)
 # -
 
 dict_propid2value = {}
