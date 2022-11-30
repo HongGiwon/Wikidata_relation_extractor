@@ -9,6 +9,55 @@ import pickle
 import math
 from json import JSONDecodeError
 
+# +
+dataset_name = "test"
+with open('./NQ/' + dataset_name + '.json', 'r') as f:
+    NQ_data = json.load(f)
+
+# query id set
+all_query_set = set()
+for qid in tqdm(dict_query_train_ent):
+    all_query_set.update(set(dict_query_train_ent[qid]))
+for qid in tqdm(dict_query_dev_ent):
+    all_query_set.update(set(dict_query_train_ent[qid]))
+for qid in tqdm(dict_query_test_ent):
+    all_query_set.update(set(dict_query_train_ent[qid]))
+
+# context set
+all_context_set = set()
+for qid in tqdm(dict_ctx_ent):
+    all_context_set.update(set(dict_ctx_ent[qid]))
+
+# +
+# TFIDF score for each passage
+all_doc_num = len(dict_ctx_ent)
+avg_doc_len = 0
+k1 = 1.2
+b = 0.75
+entity_DF = defaultdict(int)
+
+for did in tqdm(dict_ctx_ent):
+    avg_doc_len += len(dict_ctx_ent[did])
+    for eid in set(dict_ctx_ent[did]):
+        entity_DF[eid] += 1
+
+avg_doc_len /= all_doc_num
+
+entity_IDF = {}
+
+for eid in tqdm(entity_DF):
+    entity_IDF[eid] = math.log((all_doc_num-entity_DF[eid]+0.5) / (entity_DF[eid]+0.5))
+
+entity_TFIDF = {}
+
+for did in tqdm(dict_ctx_ent):
+    entity_TFIDF[did] = {}
+    for eid in set(dict_ctx_ent[did]):
+        f_de = dict_ctx_ent[did].count(eid)
+        TF_de = (f_de * (k1 + 1)) / (f_de + k1 * (1 - b + b * (len(dict_ctx_ent[did]) / avg_doc_len)))
+        entity_TFIDF[did][eid] = entity_IDF[eid] * TF_de
+# -
+
 dict_propid2value = {}
 dict_entityid2value = {}
 
