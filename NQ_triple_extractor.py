@@ -9,8 +9,12 @@ import pickle
 import math
 from json import JSONDecodeError
 
-# +
+k1 = 1.2
+b = 0.75
+thre_tfidf = 10.0
 dataset_name = "test"
+
+# +
 with open('./NQ/' + dataset_name + '.json', 'r') as f:
     NQ_data = json.load(f)
 
@@ -32,8 +36,6 @@ for qid in tqdm(dict_ctx_ent):
 # TFIDF score for each passage
 all_doc_num = len(dict_ctx_ent)
 avg_doc_len = 0
-k1 = 1.2
-b = 0.75
 entity_DF = defaultdict(int)
 
 for did in tqdm(dict_ctx_ent):
@@ -71,7 +73,6 @@ avg_ent_num_ori /= all_doc_num
 # +
 dict_set_ctx_ent_tdidf = {}
 avg_ent_num = 0
-thre_tfidf = 10.0
 for did in tqdm(entity_TFIDF):
     dict_set_ctx_ent_tdidf[did] = set()
     for eid in entity_TFIDF[did]:
