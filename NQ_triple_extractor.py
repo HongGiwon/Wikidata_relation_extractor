@@ -18,6 +18,15 @@ dataset_name = "test"
 with open('./NQ/' + dataset_name + '.json', 'r') as f:
     NQ_data = json.load(f)
 
+with open('./dict_query_train_ent.pkl', 'rb') as f:
+    dict_query_train_ent = pickle.load(f)
+with open('./dict_query_dev_ent.pkl', 'rb') as f:
+    dict_query_dev_ent = pickle.load(f)
+with open('./dict_query_test_ent.pkl', 'rb') as f:
+    dict_query_test_ent = pickle.load(f)
+with open('./dict_ctx_ent.pkl', 'rb') as f:
+    dict_ctx_ent = pickle.load(f)
+
 # query id set
 all_query_set = set()
 for qid in tqdm(dict_query_train_ent):

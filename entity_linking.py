@@ -13,7 +13,10 @@ nlp.add_pipe("entityLinker", last=True)
 dict_query_ent = {}
 dict_ctx_ent = {}
 dict_title2id = defaultdict(list)
+dict_set_query_ent = {}
+dict_set_ctx_ent = {}
 
+# +
 for filename in ["test", "dev", "train"][:1]:
 
     with open('./NQ/' + filename + '.json', 'r') as f:
@@ -40,7 +43,16 @@ for filename in ["test", "dev", "train"][:1]:
 
     with open('./dict_query_' + filename + '_ent.pkl', 'wb') as f:
         pickle.dump(dict_query_ent, f)
+    for key in dict_query_ent:
+        dict_set_query_ent[key] = set(dict_query_ent[key])
+    with open('./dict_set_query_' + filename + '_ent.pkl', 'wb') as f:
+        pickle.dump(dict_set_query_ent, f)
+    
 with open('./dict_ctx_ent.pkl', 'wb') as f:
     pickle.dump(dict_ctx_ent, f)
 with open('./dict_title2id.pkl', 'wb') as f:
     pickle.dump(dict_title2id, f)
+for key in dict_ctx_ent:
+    dict_set_ctx_ent[key] = set(dict_ctx_ent[key])
+with open('./dict_set_ctx_ent.pkl', 'wb') as f:
+    pickle.dump(dict_set_ctx_ent, f)
