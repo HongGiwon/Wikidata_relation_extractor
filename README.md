@@ -28,7 +28,3 @@ Requirements: <code>pip install -r requirements.txt</code>
 <code>python entity_linking.py</code>
 
 <code>python NQ_triple_extractor.py</code>
-
-```python
-
-```
