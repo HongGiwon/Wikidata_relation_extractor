@@ -9,8 +9,8 @@ import pickle
 import math
 from json import JSONDecodeError
 
-k1 = 1.2
-b = 0.75
+k1 = 1.2 #tfidf
+b = 0.75 #tfidf
 thre_tfidf = 10.0
 dataset_name = "test"
 
@@ -103,7 +103,7 @@ print("reduce in comp",(avg_ent_num_ori / avg_ent_num) **2)
 dict_propid2value = {}
 dict_entityid2value = {}
 
-def wikidata_triple_retrieve(e1, e2):
+def wikidata_triple_retrieve(e1, e2): #given entity pair, retrieve all possible relation between them
     time.sleep(0.5)
 
     entity_s = " ".join(["wd:Q"+str(qid) for qid in e1])
@@ -145,7 +145,7 @@ def wikidata_triple_retrieve(e1, e2):
     return return_list
 
 
-batch_size = 200
+batch_size = 200 # batch for wikidata api
 NQ_q2c_triples = []
 NQ_c2c_triples = []
 error_list = []
@@ -175,7 +175,7 @@ for NQ_idx, NQ_ins in enumerate(tqdm(NQ_data)):
 # error handling
 batch_size = 20
 for NQ_idx in tqdm(error_list):
-    print(NQ_idx)
+    print(NQ_idx) #error index
     Q_entity = dict_set_query_test_ent[NQ_idx]
     C_entity_batch = set()
     for NQ_ins_ctx_idx, NQ_ins_ctx in enumerate(NQ_data[NQ_idx]['ctxs'][:10]):
@@ -191,7 +191,7 @@ for NQ_idx in tqdm(error_list):
     NQ_q2c_triples[NQ_idx] += result_Q
 
 # +
-dict_pair2prop = defaultdict(set)
+dict_pair2prop = defaultdict(set) # dict entity pair -> relation (property)
 
 for triples in tqdm(NQ_q2c_triples):
     for triple in triples:
@@ -201,8 +201,8 @@ for triples in tqdm(NQ_c2c_triples):
         dict_pair2prop[(triple[0],triple[1])].add(triple[2])
 # -
 
-delimiter = "__"
-line_delimiter = "&&"
+delimiter = "__" #delimiter for each component in triple (entity / relation / entity)
+line_delimiter = "&&" #delimiter for each triple (triple / triple)
 for NQ_idx, NQ_ins in enumerate(tqdm(NQ_data)):
     Q_triples = NQ_q2c_triples[NQ_idx]
     Q_triples_text = ""
