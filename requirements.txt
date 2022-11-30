@@ -1,0 +1,3 @@
+spacy
+spacy-entity-linker
+qwikidata
