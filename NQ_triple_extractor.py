@@ -189,3 +189,49 @@ for NQ_idx in tqdm(error_list):
         result_C += wikidata_triple_retrieve(C_entity_batch, C_entity_batch_list[i*batch_size:(i+1)*batch_size])
     NQ_c2c_triples[NQ_idx] += result_C
     NQ_q2c_triples[NQ_idx] += result_Q
+
+# +
+dict_pair2prop = defaultdict(set)
+
+for triples in tqdm(NQ_q2c_triples):
+    for triple in triples:
+        dict_pair2prop[(triple[0],triple[1])].add(triple[2])
+for triples in tqdm(NQ_c2c_triples):
+    for triple in triples:
+        dict_pair2prop[(triple[0],triple[1])].add(triple[2])
+# -
+
+delimiter = "__"
+line_delimiter = "&&"
+for NQ_idx, NQ_ins in enumerate(tqdm(NQ_data)):
+    Q_triples = NQ_q2c_triples[NQ_idx]
+    Q_triples_text = ""
+    for triple in Q_triples:
+        Q_triples_text += dict_entityid2value[triple[0]] + delimiter + dict_propid2value[triple[2]] + delimiter + dict_entityid2value[triple[1]] + line_delimiter
+    NQ_data[NQ_idx]["Q_triples_text"] = Q_triples_text
+    
+    c_entity_batch = set()
+    for NQ_ins_ctx_idx, NQ_ins_ctx in enumerate(NQ_data[NQ_idx]['ctxs'][:10]):
+        c_entity_batch.update(dict_set_ctx_ent_tdidf[NQ_ins_ctx['id']])
+    
+    for NQ_ins_ctx_idx, NQ_ins_ctx in enumerate(NQ_data[NQ_idx]['ctxs'][:10]):
+        C_entity_s = dict_set_ctx_ent_tdidf[NQ_ins_ctx['id']]
+        C_entity_o = c_entity_batch - C_entity_s
+        C_triples_text = ""
+        for entity_s in C_entity_s:
+            triple_s = "Q"+str(entity_s)
+            for entity_o in C_entity_o:
+                triple_o = "Q"+str(entity_o)
+                if (triple_s, triple_o) in dict_pair2prop:
+                    for triple_p in dict_pair2prop[(triple_s, triple_o)]:
+                        C_triples_text += dict_entityid2value[triple_s] + delimiter + dict_propid2value[triple_p] + delimiter + dict_entityid2value[triple_o] + line_delimiter
+        NQ_data[NQ_idx]['ctxs'][NQ_ins_ctx_idx]["C_triples_text"] = C_triples_text
+    
+    C_triples_all = NQ_c2c_triples[NQ_idx]
+    C_triples_text_all = ""
+    for triple in C_triples_all:
+        C_triples_text_all += dict_entityid2value[triple[0]] + delimiter + dict_propid2value[triple[2]] + delimiter + dict_entityid2value[triple[1]] + line_delimiter
+    NQ_data[NQ_idx]["C_triples_text_all"] = C_triples_text_all
+
+with open('./NQ/' + dataset_name + '_triple_tfidf_thre' + str(thre_tfidf) + '_delimiter.json', 'w') as f:
+    json.dump(NQ_data, f)
