@@ -26,6 +26,12 @@ with open('./dict_query_test_ent.pkl', 'rb') as f:
     dict_query_test_ent = pickle.load(f)
 with open('./dict_ctx_ent.pkl', 'rb') as f:
     dict_ctx_ent = pickle.load(f)
+with open('./dict_set_query_train_ent.pkl', 'rb') as f:
+    dict_set_query_train_ent = pickle.load(f)
+with open('./dict_set_query_dev_ent.pkl', 'rb') as f:
+    dict_set_query_dev_ent = pickle.load(f)
+with open('./dict_set_query_test_ent.pkl', 'rb') as f:
+    dict_set_query_test_ent = pickle.load(f)
 
 # query id set
 all_query_set = set()
@@ -137,3 +143,31 @@ def wikidata_triple_retrieve(e1, e2):
             dict_entityid2value[e2_id] = e2_label
         return_list.append((e1_id,e2_id,prop_id))
     return return_list
+
+
+batch_size = 200
+NQ_q2c_triples = []
+NQ_c2c_triples = []
+error_list = []
+for NQ_idx, NQ_ins in enumerate(tqdm(NQ_data)):
+    try:
+        Q_entity = dict_set_query_test_ent[NQ_idx]
+
+        C_entity_batch = set()
+        for NQ_ins_ctx_idx, NQ_ins_ctx in enumerate(NQ_data[NQ_idx]['ctxs'][:10]):
+            C_entity_batch.update(dict_set_ctx_ent_tdidf[NQ_ins_ctx['id']])
+
+        result_Q = wikidata_triple_retrieve(Q_entity, C_entity_batch)
+        result_Q += wikidata_triple_retrieve(C_entity_batch, Q_entity)
+
+        result_C = []
+        C_entity_batch_list = list(C_entity_batch)
+        for i in range(int(len(C_entity_batch) / batch_size) + bool(len(C_entity_batch) % batch_size)):
+            result_C += wikidata_triple_retrieve(C_entity_batch, C_entity_batch_list[i*batch_size:(i+1)*batch_size])
+        NQ_c2c_triples.append(result_C)
+        NQ_q2c_triples.append(result_Q)
+    except (JSONDecodeError, ConnectionError, TimeoutError, MaxRetryError) as error:
+        time.sleep(60)
+        error_list.append(NQ_idx)
+        NQ_c2c_triples.append([])
+        NQ_q2c_triples.append([])
